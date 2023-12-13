@@ -34,7 +34,7 @@ Due to the limiting file size of Github, we need **one** package and **two** fil
 
 ## :building_construction: How to build
 
-> Please follow the below commands to build DynaVINS (on ROS).
+> Please follow the below commands to build (on ROS).
 
 ``` bash
 $ cd ~/catkin_ws/src 
