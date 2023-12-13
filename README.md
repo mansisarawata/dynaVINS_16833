@@ -1,3 +1,10 @@
+# 16833 Advancing Dynamic Visual-Inertial SLAM
+## A Comprehensive Exploration of Bundle Adjustment Techniques
+
+This repository is dedicated to maintaining synchronization with the official implementation of the 16833 Capstone Project. It serves as the documentation hub for the project, ensuring that the information remains current and up-to-date.
+
+The project aims at exploring differnt bundle adjustment techniques and thier effects on dynamic slam. As traditional slam usually assume static landmarks typically localizaion inaccuraise occur in case when the environment contains dynamic objects(eg cars :car:, humans :runner:, buses :bus:, etc). For this project we build on the paper : DynaVINS [paper][arXivlink]
+
 # DynaVINS: A Visual-Inertial SLAM for Dynamic Environments
 
 ## :bookmark_tabs: About DynaVINS (IEEE RA-L'22)
