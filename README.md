@@ -62,9 +62,9 @@ $ rosbag play 3_high.bag (or 0_none.bag, 1_low.bag, ...)
 
 If you have any questions, please do not hesitate to contact us:
 
-* [Mansi Sarawata] :envelope: `msarawat at andrew.cmu.edu`
-* [Vedang Kokil] :envelope: `vkokil at andrew.cmu.edu`
-* [Sriharan Balakrishnan] :envelope: `sriharab at andrew.cmu.edu`
+* [Mansi Sarawata] :envelope: `msarawat@andrew.cmu.edu`
+* [Vedang Kokil] :envelope: `vkokil@andrew.cmu.edu`
+* [Sriharan Balakrishnan] :envelope: `sriharab@andrew.cmu.edu`
 
 
 [arXivlink]: https://arxiv.org/abs/2208.11500
