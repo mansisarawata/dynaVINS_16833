@@ -165,8 +165,17 @@ void FeatureManager::setDepth(const VectorXd &x)
     else
       it_per_id.solve_flag = 1;
   }
-}
+    //mvhhhhhhhh
+    // if (it_per_id.estimated_depth < 0)
+    //     {
+    //         it_per_id.solve_flag = 2;
+    //     }
+    //     else
+    //         it_per_id.solve_flag = 1;
+    // }
 
+}
+//mvh commented
 void FeatureManager::setWeight(const VectorXd &x)
 {
   int feature_index = -1;
@@ -222,6 +231,7 @@ VectorXd FeatureManager::getDepthVector()
   return dep_vec;
 }
 
+//mvh
 VectorXd FeatureManager::getWeightVector()
 {
   VectorXd weight_vec(getFeatureCount());

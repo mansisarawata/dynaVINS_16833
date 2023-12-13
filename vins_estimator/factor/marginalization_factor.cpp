@@ -12,8 +12,9 @@
 void ResidualBlockInfo::Evaluate()
 {
     residuals.resize(cost_function->num_residuals());
-
+    // std::cout<<"haranpara1"<<std::endl;
     std::vector<int> block_sizes = cost_function->parameter_block_sizes();
+    // std::cout<<"haranpara2"<<std::endl;
     raw_jacobians = new double *[block_sizes.size()];
     jacobians.resize(block_sizes.size());
 
@@ -100,7 +101,9 @@ void MarginalizationInfo::addResidualBlockInfo(ResidualBlockInfo *residual_block
     factors.emplace_back(residual_block_info);
 
     std::vector<double *> &parameter_blocks = residual_block_info->parameter_blocks;
+    // std::cout<<"haranpara3"<<std::endl;
     std::vector<int> parameter_block_sizes = residual_block_info->cost_function->parameter_block_sizes();
+    // std::cout<<"haranpara4"<<std::endl;
 
     for (int i = 0; i < static_cast<int>(residual_block_info->parameter_blocks.size()); i++)
     {
@@ -121,8 +124,10 @@ void MarginalizationInfo::preMarginalize()
     for (auto it : factors)
     {
         it->Evaluate();
+        // std::cout<<"haranpara5"<<std::endl;
 
         std::vector<int> block_sizes = it->cost_function->parameter_block_sizes();
+        // std::cout<<"haranpara6"<<std::endl;
         for (int i = 0; i < static_cast<int>(block_sizes.size()); i++)
         {
             long addr = reinterpret_cast<long>(it->parameter_blocks[i]);
@@ -313,7 +318,9 @@ void MarginalizationInfo::marginalize()
 std::vector<double *> MarginalizationInfo::getParameterBlocks(std::unordered_map<long, double *> &addr_shift)
 {
     std::vector<double *> keep_block_addr;
+    // std::cout<<"haranpara8"<<std::endl;
     keep_block_size.clear();
+    // std::cout<<"haranpara9"<<std::endl;
     keep_block_idx.clear();
     keep_block_data.clear();
 
@@ -321,14 +328,17 @@ std::vector<double *> MarginalizationInfo::getParameterBlocks(std::unordered_map
     {
         if (it.second >= m)
         {
+            // std::cout<<"haranpara10"<<std::endl;
             keep_block_size.push_back(parameter_block_size[it.first]);
+            // std::cout<<"haranpara11"<<std::endl;
             keep_block_idx.push_back(parameter_block_idx[it.first]);
             keep_block_data.push_back(parameter_block_data[it.first]);
             keep_block_addr.push_back(addr_shift[it.first]);
         }
     }
+    // std::cout<<"haranpara12"<<std::endl;
     sum_block_size = std::accumulate(std::begin(keep_block_size), std::end(keep_block_size), 0);
-
+    // std::cout<<"haranpara13"<<std::endl;
     return keep_block_addr;
 }
 
@@ -336,8 +346,10 @@ MarginalizationFactor::MarginalizationFactor(MarginalizationInfo* _marginalizati
 {
     int cnt = 0;
     for (auto it : marginalization_info->keep_block_size)
-    {
+    {   
+        // std::cout<<"haranpara14"<<std::endl;
         mutable_parameter_block_sizes()->push_back(it);
+        // std::cout<<"haranpara15"<<std::endl;
         cnt += it;
     }
     //printf("residual size: %d, %d\n", cnt, n);
@@ -359,7 +371,9 @@ bool MarginalizationFactor::Evaluate(double const *const *parameters, double *re
     Eigen::VectorXd dx(n);
     for (int i = 0; i < static_cast<int>(marginalization_info->keep_block_size.size()); i++)
     {
+        // std::cout<<"haranpara17"<<std::endl;
         int size = marginalization_info->keep_block_size[i];
+        // std::cout<<"haranpara18"<<std::endl;
         int idx = marginalization_info->keep_block_idx[i] - m;
         Eigen::VectorXd x = Eigen::Map<const Eigen::VectorXd>(parameters[i], size);
         Eigen::VectorXd x0 = Eigen::Map<const Eigen::VectorXd>(marginalization_info->keep_block_data[i], size);
@@ -383,7 +397,9 @@ bool MarginalizationFactor::Evaluate(double const *const *parameters, double *re
         {
             if (jacobians[i])
             {
+                // std::cout<<"haranpara21"<<std::endl;
                 int size = marginalization_info->keep_block_size[i], local_size = marginalization_info->localSize(size);
+                // std::cout<<"haranpara22"<<std::endl;
                 int idx = marginalization_info->keep_block_idx[i] - m;
                 Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> jacobian(jacobians[i], n, size);
                 jacobian.setZero();

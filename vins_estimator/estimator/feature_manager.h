@@ -67,15 +67,15 @@ class FeaturePerId
     int used_num;
     double estimated_depth;
     int solve_flag; // 0 haven't solve yet; 1 solve succ; 2 solve fail;
-    int weightNum;
-    double weight;
+    int weightNum; 
+    double weight; 
 
     FeaturePerId(int _feature_id, int _start_frame)
         : feature_id(_feature_id), start_frame(_start_frame),
           used_num(0), estimated_depth(-1.0), solve_flag(0)
     {
-      weight = 1.0;
-      weightNum = 1;
+      weight = 1.0; 
+      weightNum = 1; 
     }
 
     int endFrame();
@@ -93,11 +93,11 @@ class FeatureManager
     vector<pair<Vector3d, Vector3d>> getCorresponding(int frame_count_l, int frame_count_r);
     //void updateDepth(const VectorXd &x);
     void setDepth(const VectorXd &x);
-    void setWeight(const VectorXd &x);
+    void setWeight(const VectorXd &x); //mvh comment
     void removeFailures();
     void clearDepth();
     VectorXd getDepthVector();
-    VectorXd getWeightVector();
+    VectorXd getWeightVector(); // mvh coment 
     void triangulate(int frameCnt, Vector3d Ps[], Matrix3d Rs[], Vector3d tic[], Matrix3d ric[]);
     void triangulatePoint(Eigen::Matrix<double, 3, 4> &Pose0, Eigen::Matrix<double, 3, 4> &Pose1,
                             Eigen::Vector2d &point0, Eigen::Vector2d &point1, Eigen::Vector3d &point_3d);

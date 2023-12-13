@@ -10,9 +10,11 @@
 #include "estimator.h"
 #include "../utility/visualization.h"
 
+
+
 Estimator::Estimator(): f_manager{Rs}
 {
-  ROS_INFO("init begins");
+  ROS_INFO("init begins yes here haran2");
   initThreadFlag = false;
   clearState();
 }
@@ -638,7 +640,7 @@ void Estimator::vector2double()
   for (int i = 0; i < f_manager.getFeatureCount(); i++)
   {
     para_Feature[i][0] = dep(i);
-    para_FeatureWeight[i][0] = weight(i);
+    para_FeatureWeight[i][0] = weight(i); ///mvh
   }
 
   para_Td[0][0] = td;
@@ -794,7 +796,9 @@ void Estimator::optimizeVIO(bool flagOptimizeWeight,double & costDiff)
   TicToc t_whole, t_prepare;
   ceres::Problem problem;
   ceres::LossFunction *loss_function;
-  loss_function = new ceres::HuberLoss(1.0);
+  loss_function = new ceres::HuberLoss(1.0); 
+  // loss_function = new ceres::TrivialLoss();
+  // loss_function = new ceres::CauchyLoss(1.0); //mvh
 
   for (int i = 0; i < frame_count + 1; i++)
   {
@@ -843,11 +847,11 @@ void Estimator::optimizeVIO(bool flagOptimizeWeight,double & costDiff)
     }
 
     ++feature_index;
-
+    ROS_INFO("our code haran3");
     //ADDITIONAL FEATURE : NO USE IN OPT.
     //if(it_per_id.weight<DYN_FEAT_MARGIN_THRESH) continue;
     ++feature_index_o;
-
+// Comment for dyna 2 fusiion mvh
     problem.AddParameterBlock(para_FeatureWeight[feature_index] ,1);
     if(!flagOptimizeWeight)
     {
@@ -878,28 +882,44 @@ void Estimator::optimizeVIO(bool flagOptimizeWeight,double & costDiff)
 
     Vector3d pts_i = it_per_id.feature_per_frame[0].point;
 
+    // std::cout<<para_FeatureWeight[feature_index][0]<<std::endl;
+    // std::cout<<"new loop"<<std::endl;
     for (auto &it_per_frame : it_per_id.feature_per_frame)
-    {
+    { 
+      // std::cout<<"new loop"<<std::endl;
       imu_j++;
       if (imu_i != imu_j)
       {
+        // ROS_INFO("haran7");
+        // std::cout<<para_FeatureWeight[feature_index][0];
         Vector3d pts_j = it_per_frame.point;
         ProjectionTwoFrameOneCamFactor *f_td = new ProjectionTwoFrameOneCamFactor(pts_i, pts_j, it_per_id.feature_per_frame[0].velocity, it_per_frame.velocity,
             it_per_id.feature_per_frame[0].cur_td, it_per_frame.cur_td);
-        problem.AddResidualBlock(f_td, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index], para_Td[0], para_FeatureWeight[feature_index]);
+        // problem.AddResidualBlock(f_td, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index], para_Td[0], para_FeatureWeight[feature_index]);
+        // std::cout<<"haran_para1"<<std::endl;
+        // // f_td->parameter_block_sizes().pop_back();
+        // std::cout<<f_td->parameter_block_sizes()[-1]<<std::endl;
+        // std::cout<<f_td->parameter_block_sizes().size()<<std::endl;
+        problem.AddResidualBlock(f_td, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index], para_Td[0], para_FeatureWeight[feature_index]);//mvh     
+        // std::cout<<"haran_para0"<<std::endl;
       }
+      // for (const auto& size : f_td->parameter_block_sizes()) {
+      //     std::cout << size << " ";
+      // }
 
       if(STEREO && it_per_frame.is_stereo)
       {
         Vector3d pts_j_right = it_per_frame.pointRight;
         if(imu_i != imu_j)
         {
+          ROS_INFO("haran6");
           ProjectionTwoFrameTwoCamFactor *f = new ProjectionTwoFrameTwoCamFactor(pts_i, pts_j_right, it_per_id.feature_per_frame[0].velocity, it_per_frame.velocityRight,
               it_per_id.feature_per_frame[0].cur_td, it_per_frame.cur_td);
           problem.AddResidualBlock(f, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Ex_Pose[1], para_Feature[feature_index], para_Td[0], para_FeatureWeight[feature_index]);
         }
         else
         {
+          ROS_INFO("haran5");
           ProjectionOneFrameTwoCamFactor *f = new ProjectionOneFrameTwoCamFactor(pts_i, pts_j_right, it_per_id.feature_per_frame[0].velocity, it_per_frame.velocityRight,
               it_per_id.feature_per_frame[0].cur_td, it_per_frame.cur_td);
           problem.AddResidualBlock(f, loss_function, para_Ex_Pose[0], para_Ex_Pose[1], para_Feature[feature_index], para_Td[0]);
@@ -908,18 +928,27 @@ void Estimator::optimizeVIO(bool flagOptimizeWeight,double & costDiff)
       }
       f_m_cnt++;
     }
+    // for(int i=0;i<1000;i++){
+      // std::cout<<para_FeatureWeight[i][0];
+    // }
+    // std::cout<<"count for loop"<<std::endl;
+
   }
 //  printf("used features(v): %d \n", feature_index+1);
 //  printf("used features(o): %d \n", feature_index_o+1);
   printf("used features: %d \n", feature_index_o+1);
 
   ROS_DEBUG("visual measurement count: %d", f_m_cnt);
+
+  // std::cout<<"haran_process1"<<std::endl;
   ceres::Solver::Options options;
 
+  // std::cout<<"haran_process2"<<std::endl;
   options.linear_solver_type = ceres::DENSE_SCHUR;
-  options.num_threads = 2;
+  options.num_threads = 2; //mvh
   options.trust_region_strategy_type = ceres::DOGLEG;
   options.max_num_iterations = NUM_ITERATIONS;
+  // std::cout<<"haran_process3"<<std::endl;
   //options.use_explicit_schur_complement = true;
   //options.minimizer_progress_to_stdout = true;
   //options.use_nonmonotonic_steps = true;
@@ -927,9 +956,12 @@ void Estimator::optimizeVIO(bool flagOptimizeWeight,double & costDiff)
     options.max_solver_time_in_seconds = SOLVER_TIME * 4.0 / 5.0;
   else
     options.max_solver_time_in_seconds = SOLVER_TIME;
+  // std::cout<<"haran_process4"<<std::endl;
   TicToc t_solver;
   ceres::Solver::Summary summary;
+  // std::cout<<"haran_process5"<<std::endl;
   ceres::Solve(options, &problem, &summary);
+  // std::cout<<"haran_process6"<<std::endl;
   costDiff = summary.final_cost/summary.initial_cost;
 }
 
@@ -938,6 +970,8 @@ void Estimator::optimization()
 {
   ceres::LossFunction *loss_function;
   loss_function = new ceres::HuberLoss(1.0);
+  // loss_function = new ceres::TrivialLoss();
+  // loss_function = new ceres::CauchyLoss(1.0); //mvh TrivialLoss
 
   TicToc t_whole, t_prepare;
   TicToc t_solver;
@@ -950,12 +984,12 @@ void Estimator::optimization()
   while(costDiff<DYN_ALT_CONV && iteration<5)
   {
     optimizeVIO(true,costDiff);
-    optimizeVIO(false,costDiff);
+    optimizeVIO(false,costDiff); //##mvh
     std::cout<<"COSTDIFF:"<<costDiff<<std::endl;
     iteration++;
   }
 
-
+// Commit for dyna to fusion mvh
   for (auto &it_per_id : f_manager.feature)
   {
     it_per_id.used_num = it_per_id.feature_per_frame.size();
@@ -1035,9 +1069,13 @@ void Estimator::optimization()
             Vector3d pts_j = it_per_frame.point;
             ProjectionTwoFrameOneCamFactor *f_td = new ProjectionTwoFrameOneCamFactor(pts_i, pts_j, it_per_id.feature_per_frame[0].velocity, it_per_frame.velocity,
                 it_per_id.feature_per_frame[0].cur_td, it_per_frame.cur_td);
+            // std::cout<<"haran_para2"<<std::endl;
             ResidualBlockInfo *residual_block_info = new ResidualBlockInfo(f_td, loss_function,
                                                                            vector<double *>{para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index], para_Td[0],para_FeatureWeight[feature_index]},
-                                                                           vector<int>{0, 3,5});
+                                                                           vector<int>{0, 3,5}); //mvh
+            // ResidualBlockInfo *residual_block_info = new ResidualBlockInfo(f_td, loss_function,
+            //                                                                vector<double *>{para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Feature[feature_index], para_Td[0],para_FeatureWeight[feature_index]},
+            //                                                                vector<int>{0, 3,5});
             marginalization_info->addResidualBlockInfo(residual_block_info);
           }
           if(STEREO && it_per_frame.is_stereo)
@@ -1047,9 +1085,13 @@ void Estimator::optimization()
             {
               ProjectionTwoFrameTwoCamFactor *f = new ProjectionTwoFrameTwoCamFactor(pts_i, pts_j_right, it_per_id.feature_per_frame[0].velocity, it_per_frame.velocityRight,
                   it_per_id.feature_per_frame[0].cur_td, it_per_frame.cur_td);
+              // std::cout<<"haran_para4"<<std::endl;
               ResidualBlockInfo *residual_block_info = new ResidualBlockInfo(f, loss_function,
                                                                              vector<double *>{para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Ex_Pose[1], para_Feature[feature_index], para_Td[0],para_FeatureWeight[feature_index]},
-                                                                             vector<int>{0, 4, 6});
+                                                                             vector<int>{0, 4, 6});//mvh
+              // ResidualBlockInfo *residual_block_info = new ResidualBlockInfo(f, loss_function,
+              //                                                                vector<double *>{para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_Ex_Pose[1], para_Feature[feature_index], para_Td[0],para_FeatureWeight[feature_index]},
+              //                                                                vector<int>{0, 4, 6});
               marginalization_info->addResidualBlockInfo(residual_block_info);
             }
             else

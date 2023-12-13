@@ -553,6 +553,8 @@ void PoseGraph::optimizeBA(const std::vector<int> targetGroups,
   ceres::Problem problem;
   ceres::LossFunction *loss_function;
   loss_function = new ceres::HuberLoss(3.0);
+  // loss_function = new ceres::TrivialLoss();
+  // loss_function = new ceres::CauchyLoss(1.0); //mvh
   ceres::Solver::Options options;
   options.max_num_iterations = 1000;
   options.preconditioner_type = ceres::SCHUR_JACOBI;
@@ -948,7 +950,9 @@ void PoseGraph::optimize4DoF()
       ceres::Solver::Summary summary;
       ceres::LossFunction *loss_function;
       loss_function = new ceres::HuberLoss(0.1);
-      //loss_function = new ceres::CauchyLoss(1.0);
+      // loss_function = new ceres::CauchyLoss(1.0);
+      // loss_function = new ceres::TrivialLoss();
+      // loss_function = new ceres::CauchyLoss(1.0); //mvh
       ceres::LocalParameterization* angle_local_parameterization =
           AngleLocalParameterization::Create();
 
@@ -1230,6 +1234,8 @@ void PoseGraph::optimize6DoF()
       ceres::LossFunction *loss_function;
       loss_function = new ceres::HuberLoss(0.1);
       //loss_function = new ceres::CauchyLoss(1.0);
+      // loss_function = new ceres::TrivialLoss();
+      // loss_function = new ceres::CauchyLoss(1.0); //mvh
       ceres::LocalParameterization* local_parameterization = new ceres::QuaternionParameterization();
 
       vector<KeyFrame*>::iterator it;

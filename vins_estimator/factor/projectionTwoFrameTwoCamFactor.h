@@ -18,6 +18,7 @@
 #include "../utility/tic_toc.h"
 #include "../estimator/parameters.h"
 
+// class ProjectionTwoFrameTwoCamFactor : public ceres::SizedCostFunction<2, 7, 7, 7, 7, 1, 1, 1> //mvh
 class ProjectionTwoFrameTwoCamFactor : public ceres::SizedCostFunction<2, 7, 7, 7, 7, 1, 1, 1>
 {
   public:
